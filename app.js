@@ -235,7 +235,6 @@ function displayTasks(tasks, tableBodyId, isCompleted = false) {
 }
 
 // Update dashboard stats
-// Update dashboard stats
 async function updateDashboardStats(tasks) {
     if (!tasks) {
         try {
@@ -250,7 +249,7 @@ async function updateDashboardStats(tasks) {
     }
     
     // Filter out completed tasks for priority counts
-    const activeTasks = tasks.filter(t => t.status !== 'completed');
+    const activeTasks = tasks.filter(t => t.status !== 'completed' && t => t.status !== 'cancelled');
     
     // Status counts (all tasks)
     const pending = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
