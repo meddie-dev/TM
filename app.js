@@ -159,8 +159,16 @@ async function loadTasks() {
         });
         
         // Separate active and completed tasks
-        const activeTasks = processedTasks.filter(task => task.status !== 'completed');
-        const completedTasks = processedTasks.filter(task => task.status === 'completed');
+        // ACTIVE TASKS - SORTED BY PRIORITY (High > Medium > Low)
+        const activeTasks = processedTasks
+            .filter(task => task.status !== 'completed' && task.status !== 'cancelled')
+            .sort((a, b) => {
+                // Priority order: high > medium > low
+                const priorityOrder = { high: 0, medium: 1, low: 2 };
+                return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+            });
+        
+        const completedTasks = processedTasks.filter(task => task.status === 'completed' || task.status === 'cancelled');
         
         displayTasks(activeTasks, 'activeTasksTableBody');
         displayTasks(completedTasks, 'completedTasksTableBody', true);
@@ -248,14 +256,8 @@ async function updateDashboardStats(tasks) {
         }
     }
     
-    // Filter out completed tasks for priority counts
-const activeTasks = processedTasks
-    .filter(task => task.status !== 'completed' && task.status !== 'cancelled')
-    .sort((a, b) => {
-        // Priority order: high > medium > low
-        const priorityOrder = { high: 0, medium: 1, low: 2 };
-        return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
-    });
+    // Filter out completed/cancelled tasks for priority counts
+    const activeTasks = tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled');
     
     // Status counts (all tasks)
     const pending = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
@@ -270,7 +272,7 @@ const activeTasks = processedTasks
     if (completedCount) completedCount.textContent = completed;
     if (cancelledCount) cancelledCount.textContent = cancelled;
     
-    // Priority counts (ONLY active tasks - not completed)
+    // Priority counts (ONLY active tasks - not completed or cancelled)
     const high = activeTasks.filter(t => t.priority === 'high').length;
     const medium = activeTasks.filter(t => t.priority === 'medium').length;
     const low = activeTasks.filter(t => t.priority === 'low').length;
