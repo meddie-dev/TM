@@ -249,7 +249,13 @@ async function updateDashboardStats(tasks) {
     }
     
     // Filter out completed tasks for priority counts
-    const activeTasks = tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled');
+const activeTasks = processedTasks
+    .filter(task => task.status !== 'completed' && task.status !== 'cancelled')
+    .sort((a, b) => {
+        // Priority order: high > medium > low
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+    });
     
     // Status counts (all tasks)
     const pending = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
