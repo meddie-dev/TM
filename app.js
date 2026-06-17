@@ -192,6 +192,7 @@ async function loadTasks() {
     }
 }
 // Display tasks in table
+// Display tasks in table
 function displayTasks(tasks, tableBodyId, isCompleted = false) {
     const tbody = document.getElementById(tableBodyId);
     
@@ -205,9 +206,29 @@ function displayTasks(tasks, tableBodyId, isCompleted = false) {
         return;
     }
     
+    // SORT ACTIVE TASKS BY PRIORITY (High > Medium > Low)
+    let sortedTasks = [...tasks];
+    if (!isCompleted) {
+        sortedTasks = sortedTasks.sort((a, b) => {
+            // Define priority order: high = 0, medium = 1, low = 2
+            const priorityOrder = { 
+                'high': 0, 
+                'medium': 1, 
+                'low': 2 
+            };
+            
+            // Get priority values, convert to lowercase for comparison
+            const priorityA = a.priority ? a.priority.toLowerCase() : 'medium';
+            const priorityB = b.priority ? b.priority.toLowerCase() : 'medium';
+            
+            // Return comparison based on priority order
+            return priorityOrder[priorityA] - priorityOrder[priorityB];
+        });
+    }
+    
     tbody.innerHTML = '';
     
-    tasks.forEach(task => {
+    sortedTasks.forEach(task => {
         const row = document.createElement('tr');
         
         const isAdmin = currentUserProfile?.role === 'admin';
@@ -254,7 +275,6 @@ function displayTasks(tasks, tableBodyId, isCompleted = false) {
         tbody.appendChild(row);
     });
 }
-
 // Update dashboard stats
 async function updateDashboardStats(tasks) {
     if (!tasks) {
