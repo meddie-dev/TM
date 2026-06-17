@@ -249,7 +249,7 @@ async function updateDashboardStats(tasks) {
     }
     
     // Filter out completed tasks for priority counts
-    const activeTasks = tasks.filter(t => t.status !== 'completed' && t => t.status !== 'cancelled');
+    const activeTasks = tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled');
     
     // Status counts (all tasks)
     const pending = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
