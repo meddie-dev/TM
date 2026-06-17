@@ -106,6 +106,7 @@ async function loadUserProfile() {
 // ============================================
 
 // Load tasks
+// Load tasks
 async function loadTasks() {
     try {
         // First, get all tasks without the join to avoid foreign key issues
@@ -164,11 +165,24 @@ async function loadTasks() {
             .filter(task => task.status !== 'completed' && task.status !== 'cancelled')
             .sort((a, b) => {
                 // Priority order: high > medium > low
-                const priorityOrder = { high: 0, medium: 1, low: 2 };
-                return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+                const priorityOrder = { 
+                    'high': 0, 
+                    'medium': 1, 
+                    'low': 2 
+                };
+                // Get priority, default to medium (1) if undefined
+                const priorityA = priorityOrder[a.priority?.toLowerCase()] ?? 1;
+                const priorityB = priorityOrder[b.priority?.toLowerCase()] ?? 1;
+                return priorityA - priorityB;
             });
         
         const completedTasks = processedTasks.filter(task => task.status === 'completed' || task.status === 'cancelled');
+        
+        // Log for debugging
+        console.log('Active tasks sorted:', activeTasks.map(t => ({ 
+            title: t.title, 
+            priority: t.priority 
+        })));
         
         displayTasks(activeTasks, 'activeTasksTableBody');
         displayTasks(completedTasks, 'completedTasksTableBody', true);
@@ -177,7 +191,6 @@ async function loadTasks() {
         console.error('Error in loadTasks:', error);
     }
 }
-
 // Display tasks in table
 function displayTasks(tasks, tableBodyId, isCompleted = false) {
     const tbody = document.getElementById(tableBodyId);
