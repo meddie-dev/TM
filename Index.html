@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #1a1a1a;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .welcome i {
+            font-size: 40px;
+            color: #637eb9;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 20px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #637eb9;
+            font-size: 14px;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #637eb9;
+            cursor: pointer;
+            font-size: 19px;
+            padding: 8px 8px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #637eb9;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .stat-card.status-pending .stat-number { color: #637eb9; }
+        .stat-card.status-completed .stat-number { color: #637eb9; }
+        .stat-card.status-cancelled .stat-number { color: #637eb9; }
+        .stat-card.priority-high .stat-number { color: #637eb9; }
+        .stat-card.priority-medium .stat-number { color: #637eb9; }
+        .stat-card.priority-low .stat-number { color: #637eb9; }
+
+        .table-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+
+        .add-task-btn {
+            display: flex;
+            background: #637eb9;
+            margin-bottom: 20px;
+            margin-left: auto;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            width: auto;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-task-btn:hover {
+            background: #4d628e;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #637eb9;
+            font-weight: 600;
+            color: white;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 13px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pending { color: #ffa500; }
+        .status-in_progress { color: #2196f3; }
+        .status-completed { color: #4caf50; }
+        .status-cancelled { color: #ff4444; }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-high { color: #ff4444; }
+        .priority-medium { color: #ffa500; }
+        .priority-low { color: #87CEEB; }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+            width: auto;
+        }
+
+        .action-btn.edit {
+            color: #2196f3;
+        }
+
+        .action-btn.delete {
+            color: #ff4444;
+        }
+
+        .action-btn.view {
+            color: #637eb9;
+        }
+
+        .action-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #1a1a1a;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: auto;
+        }
+
+        .modal-close:hover {
+            color: #1a1a1a;
+        }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .modal .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            outline: none;
+            border-color: #637eb9;
+        }
+
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal .submit-btn {
+            background: #637eb9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .modal .submit-btn:hover {
+            background: #4d628e;
+        }
+
+        .admin-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .admin-panel h3 {
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Detail Modal */
+        .detail-modal .modal {
+            max-width: 700px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            color: #637eb9;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .detail-section p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Remark Styles */
+        .remark-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .remark-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .remark-user {
+            font-weight: 600;
+            color: #637eb9;
+            font-size: 12px;
+        }
+
+        .remark-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .remark-actions .action-btn {
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+
+        .remark-text {
+            color: #333;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .remark-time {
+            color: #999;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .add-remark-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .add-remark-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .add-remark-section textarea:focus {
+            outline: none;
+            border-color: #637eb9;
+        }
+
+        .add-remark-section .remark-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-remark-section .submit-remark-btn {
+            background: #637eb9;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .add-remark-section .submit-remark-btn:hover {
+            background: #4d628e;
+        }
+
+        .add-remark-section .cancel-remark-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            display: none;
+        }
+
+        .add-remark-section .cancel-remark-btn:hover {
+            background: #5a6268;
+        }
+
+        .add-remark-section .cancel-remark-btn.show {
+            display: inline-block;
+        }
+
+        /* User Management */
+        .reset-password-btn {
+            background: #637eb9;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .reset-password-btn:hover {
+            background: #4d628e;
+        }
+
+        #usersTable select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+        }
+
+        .helper-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .user-info {
+                justify-content: space-between;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-task-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome">
+                <i class="bi bi-card-text"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name" id="userNameHeader"></div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Status Stats -->
+            <div class="stat-card status-pending">
+                <div class="stat-number" id="pendingCount">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card status-completed">
+                <div class="stat-number" id="completedCount">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card status-cancelled">
+                <div class="stat-number" id="cancelledCount">0</div>
+                <div class="stat-label">Cancelled</div>
+            </div>
+            <!-- Priority Stats -->
+            <div class="stat-card priority-high">
+                <div class="stat-number" id="highCount">0</div>
+                <div class="stat-label">High Priority</div>
+            </div>
+            <div class="stat-card priority-medium">
+                <div class="stat-number" id="mediumCount">0</div>
+                <div class="stat-label">Medium Priority</div>
+            </div>
+            <div class="stat-card priority-low">
+                <div class="stat-number" id="lowCount">0</div>
+                <div class="stat-label">Low Priority</div>
+            </div>
+        </div>
+
+        <button class="add-task-btn" onclick="openModal()">
+            <i class="bi bi-plus-circle"></i> Add Task
+        </button>
+
+        <!-- Active Tasks Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2>Active Tasks</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket No</th>
+                            <th>Task Name</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th id="assigneeHeader">Assignee</th>
+                            <th>Deadline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeTasksTableBody">
+                        <tr><td colspan="7" class="loading">Loading tasks...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2>Completed Tasks</h2>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket No</th>
+                            <th>Task Name</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th id="assigneeHeaderCompleted">Assignee</th>
+                            <th>Deadline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTasksTableBody">
+                        <tr><td colspan="7" class="loading">Loading completed tasks...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Admin Panel (Users Management) -->
+        <div id="adminPanel" class="admin-panel" style="display:none; margin-top: 20px;">
+            <h3><i class="bi bi-people"></i> User Management</h3>
+            <div class="users-table">
+                <table id="usersTable">
+                    <thead>
+                        <tr><th>Email</th><th>Role</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Task</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label>Task Name *</label>
+                    <input type="text" id="modalTaskTitle" required placeholder="Enter task name">
+                </div>
+                <div class="form-group">
+                    <label>Ticket Number</label>
+                    <input type="text" id="modalTicketNumber" placeholder="Enter ticket number (optional)">
+                    <span class="helper-text">Leave empty to auto-generate</span>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="modalTaskDescription" placeholder="Enter task description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="modalTaskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="modalTaskStatus">
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="modalTaskDeadline">
+                </div>
+                <div class="form-group" id="assigneeGroup">
+                    <label>Assign To</label>
+                    <select id="modalTaskAssignTo">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Task Details Modal -->
+    <div class="modal-overlay detail-modal" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="detailModalTitle">Task Details</h2>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div id="detailContent">
+                <div class="detail-section">
+                    <h4>Ticket Number</h4>
+                    <p id="detailTicketNumber">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Task Name</h4>
+                    <p id="detailTitle">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Description</h4>
+                    <p id="detailDescription">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Priority</h4>
+                    <p id="detailPriority">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Status</h4>
+                    <p id="detailStatus">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Assignee</h4>
+                    <p id="detailAssignee">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Deadline</h4>
+                    <p id="detailDeadline">-</p>
+                </div>
+                <div class="detail-section">
+                    <h4>Remarks</h4>
+                    <div id="remarksList"></div>
+                    <div class="add-remark-section">
+                        <textarea id="remarkInput" placeholder="Add a remark..."></textarea>
+                        <div class="remark-buttons">
+                            <button class="submit-remark-btn" id="submitRemarkBtn" onclick="submitRemark()">Add Remark</button>
+                            <button class="cancel-remark-btn" id="cancelRemarkBtn" onclick="cancelRemarkEdit()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
