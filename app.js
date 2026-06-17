@@ -235,6 +235,7 @@ function displayTasks(tasks, tableBodyId, isCompleted = false) {
 }
 
 // Update dashboard stats
+// Update dashboard stats
 async function updateDashboardStats(tasks) {
     if (!tasks) {
         try {
@@ -248,7 +249,10 @@ async function updateDashboardStats(tasks) {
         }
     }
     
-    // Status counts
+    // Filter out completed tasks for priority counts
+    const activeTasks = tasks.filter(t => t.status !== 'completed');
+    
+    // Status counts (all tasks)
     const pending = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
     const completed = tasks.filter(t => t.status === 'completed').length;
     const cancelled = tasks.filter(t => t.status === 'cancelled').length;
@@ -261,10 +265,10 @@ async function updateDashboardStats(tasks) {
     if (completedCount) completedCount.textContent = completed;
     if (cancelledCount) cancelledCount.textContent = cancelled;
     
-    // Priority counts
-    const high = tasks.filter(t => t.priority === 'high').length;
-    const medium = tasks.filter(t => t.priority === 'medium').length;
-    const low = tasks.filter(t => t.priority === 'low').length;
+    // Priority counts (ONLY active tasks - not completed)
+    const high = activeTasks.filter(t => t.priority === 'high').length;
+    const medium = activeTasks.filter(t => t.priority === 'medium').length;
+    const low = activeTasks.filter(t => t.priority === 'low').length;
     
     const highCount = document.getElementById('highCount');
     const mediumCount = document.getElementById('mediumCount');
