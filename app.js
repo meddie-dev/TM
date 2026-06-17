@@ -20,8 +20,6 @@ async function init() {
         }
         
         currentUser = user;
-        console.log('User logged in:', currentUser.email);
-        
         await loadUserProfile();
         await loadUsersForAssignment();
         await loadTasks();
@@ -177,12 +175,6 @@ async function loadTasks() {
             });
         
         const completedTasks = processedTasks.filter(task => task.status === 'completed' || task.status === 'cancelled');
-        
-        // Log for debugging
-        console.log('Active tasks sorted:', activeTasks.map(t => ({ 
-            title: t.title, 
-            priority: t.priority 
-        })));
         
         displayTasks(activeTasks, 'activeTasksTableBody');
         displayTasks(completedTasks, 'completedTasksTableBody', true);
